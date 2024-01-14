@@ -26,7 +26,7 @@ func (decoder *TokenDecoder) Init(publicKeyFilePath string) error {
 	}
 	decoder.publicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKey)
 	if err != nil {
-		return fmt.Errorf("ParseRSAPublicKeyFromPEM error(%v)", err)
+		return fmt.Errorf("ParseRSAPublicKeyFromPEM.error(%v)", err)
 	}
 	return nil
 }
