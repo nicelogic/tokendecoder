@@ -22,7 +22,7 @@ type TokenDecoder struct {
 func (decoder *TokenDecoder) Init(publicKeyFilePath string) error {
 	publicKey, err := os.ReadFile(publicKeyFilePath)
 	if err != nil {
-		return fmt.Errorf("read public key file error(%v)", err)
+		return fmt.Errorf("read public key file(%v) error(%v)", publicKeyFilePath, err)
 	}
 	decoder.publicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKey)
 	if err != nil {
