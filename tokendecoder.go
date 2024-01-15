@@ -3,8 +3,9 @@ package tokendecoder
 import (
 	"context"
 	"crypto/rsa"
-	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -43,7 +44,7 @@ func (decoder *TokenDecoder) Middleware() func(http.Handler) http.Handler {
 				jwtToken := splitToken[1]
 				user, err := decoder.UserFromToken(jwtToken)
 				if err != nil {
-					ctx = context.WithValue(request.Context(), variable.ErrorCtxKey, fmt.Errorf("userFromToken.eror(%w)", err))
+					ctx = context.WithValue(request.Context(), variable.ErrorCtxKey, err)
 				} else {
 					ctx = context.WithValue(request.Context(), variable.UserCtxKey, user)
 				}
@@ -68,19 +69,29 @@ func (decoder *TokenDecoder) UserFromToken(tokenString string) (*model.User, err
 		}
 		return decoder.publicKey, nil
 	})
+	if err != nil {
+		log.Printf("jwt.Parse.error(%v)\n", err)
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenExpired}
+		}
+		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
+	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return nil, err
+		log.Printf("token.Claims.(jwt.MapClaims) not ok or token invalid\n")
+		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
 	userInfo, ok := claims[variable.JwtMapCliamsKeyUserInfo].(string)
 	if !ok {
-		return nil, fmt.Errorf("claims{%v} is not type string", variable.JwtMapCliamsKeyUserInfo)
+		log.Printf("claims{%v} is not type string\n", variable.JwtMapCliamsKeyUserInfo)
+		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
 	var user model.User
-	err = json.Unmarshal([]byte(userInfo), &user)
+	err = user.FromJson(userInfo)
 	if err != nil {
-		return nil, fmt.Errorf("json.Unmarshal(userInfo).error(%w)", err)
+		log.Printf("json.Unmarshal(userInfo).error(%v)\n", err)
+		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
 	return &user, nil
 }

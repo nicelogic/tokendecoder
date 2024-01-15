@@ -1,7 +1,8 @@
 package error
 
 const (
-	TokenInvalid = "token invalid"
+	TokenExpired        = "token expired"
+	TokenInvalid        = "token invalid"
 )
 
 type TokenDecoderError struct {
