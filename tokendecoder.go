@@ -82,16 +82,23 @@ func (decoder *TokenDecoder) UserFromToken(tokenString string) (*model.User, err
 		log.Printf("token.Claims.(jwt.MapClaims) not ok or token invalid\n")
 		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
-	userInfo, ok := claims[variable.JwtMapCliamsKeyUserInfo].(string)
+	userInfo, ok := claims[variable.JwtMapCliamsKeyUserInfo].(map[string]any)
 	if !ok {
-		log.Printf("claims{%v} is not type string\n", variable.JwtMapCliamsKeyUserInfo)
+		log.Printf("claims{%v} is not type map[string]any\n", variable.JwtMapCliamsKeyUserInfo)
 		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
-	var user model.User
-	err = user.FromJson(userInfo)
-	if err != nil {
-		log.Printf("json.Unmarshal(userInfo).error(%v)\n", err)
+	id, ok := userInfo["id"].(string)
+	if !ok {
+		log.Printf("userInfo[id].(string) is not ok\n")
 		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
-	return &user, nil
+	roles, ok := userInfo["roles"].([]string)
+	if !ok {
+		log.Printf("userInfo[roles].([]string) is not ok\n")
+		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
+	}
+	return &model.User{
+		Id:    id,
+		Roles: roles,
+	}, nil
 }
