@@ -16,8 +16,8 @@ func GetUser(ctx context.Context) (*model.User, error) {
 }
 
 func IsTokenExpired(err error) bool {
-	return errors.Is(err, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenExpired})
+	return errors.Is(err, tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenExpired})
 }
 func IsTokenInvalid(err error) bool {
-	return errors.Is(err, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid})
+	return errors.Is(err, tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid})
 }

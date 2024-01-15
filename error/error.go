@@ -9,6 +9,6 @@ type TokenDecoderError struct {
 	Err string
 }
 
-func (err *TokenDecoderError) Error() string {
+func (err TokenDecoderError) Error() string {
 	return err.Err
 }

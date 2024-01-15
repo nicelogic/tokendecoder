@@ -72,36 +72,26 @@ func (decoder *TokenDecoder) UserFromToken(tokenString string) (*model.User, err
 	if err != nil {
 		log.Printf("jwt.Parse.error(%v)\n", err)
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenExpired}
+			return nil, tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenExpired}
 		}
-		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
+		return nil, tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
 		log.Printf("token.Claims.(jwt.MapClaims) not ok or token invalid\n")
-		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
+		return nil, tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
 	userJson, ok := claims[variable.JwtMapCliamsKeyUser].(string)
 	if !ok {
 		log.Printf("claims{%v} is not type string\n", variable.JwtMapCliamsKeyUser)
-		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
+		return nil, tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
-	// id, ok := userInfo["id"].(string)
-	// if !ok {
-	// 	log.Printf("userInfo[id].(string) is not ok\n")
-	// 	return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
-	// }
-	// roles, ok := userInfo["roles"].([]string)
-	// if !ok {
-	// 	log.Printf("userInfo[roles].([]string) is not ok\n")
-	// 	return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
-	// }
 	var user model.User
 	err = user.FromJson(userJson)
 	if err != nil {
 		log.Printf("user.FromJson(userJson).error(%v)\n", err)
-		return nil, &tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
+		return nil, tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
 	return &user, nil
 }
