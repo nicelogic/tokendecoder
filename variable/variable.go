@@ -7,3 +7,8 @@ var (
 	UserCtxKey  = &model.ContextKey{Name: "user"}
 	ErrorCtxKey = &model.ContextKey{Name: "error"}
 )
+
+const (
+	RoleNormal = "normal"
+	RoleAnonymous = "anonymous"
+)
