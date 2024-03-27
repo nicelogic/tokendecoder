@@ -93,5 +93,6 @@ func (decoder *TokenDecoder) UserFromToken(tokenString string) (*model.User, err
 		log.Printf("user.FromJson(userJson).error(%v)\n", err)
 		return nil, tokendecodererror.TokenDecoderError{Err: tokendecodererror.TokenInvalid}
 	}
+	user.Token = tokenString
 	return &user, nil
 }

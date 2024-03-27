@@ -20,7 +20,7 @@ func TestUserFromJwt(t *testing.T) {
 	if err != nil {
 		if err.Error() == "Token is expired" {
 			log.Println("token is expired")
-		} else if err != nil {
+		} else {
 			t.Error(err)
 		}
 	}

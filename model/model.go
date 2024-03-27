@@ -5,6 +5,7 @@ import "encoding/json"
 type User struct {
 	Id    string   `json:"id"`
 	Roles []string `json:"roles"`
+	Token string   `json:"token"`
 }
 
 func (user *User) ToJson() (string, error) {
